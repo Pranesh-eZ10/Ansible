@@ -2,11 +2,13 @@ pipeline {
   agent any
   environment {
         GIT_REPO_URL = 'https://github.com/Pranesh-eZ10/Ansible.git'
-        TERRAFORM_DIR = "/var/lib/jenkins/workspace/${params.Pipeline_name}/terraform/s3/"
+        TERRAFORM_DIR = "/var/lib/jenkins/workspace/${params.Pipeline_name}/terraform/${params.terraform_path}"
     }
   parameters {
         string(name: "Pipeline_name", defaultValue: "", description: "enter pipeline name")
         string(name: "bucketname", defaultValue: "", description: "enter bucket name")
+        choice(name: 'Terraform_Action', choices: ['apply', 'destory'], description: 'Select Terraform actions')
+        string(name: "terraform_path", defaultValue: "", description: "enter path")
     }
   stages {
     stage('Checkout SCM') {
@@ -32,7 +34,7 @@ pipeline {
         stage('Execute terraform apply') {
             steps {
                 dir("${env.TERRAFORM_DIR}") {
-                    sh "terraform apply -auto-approve"
+                    sh "terraform ${params.Terraform_Action} -auto-approve"
                 }
             }
         }
