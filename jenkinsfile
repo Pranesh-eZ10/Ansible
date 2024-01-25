@@ -2,11 +2,11 @@ pipeline {
   agent any
   environment {
         GIT_REPO_URL = 'https://github.com/Pranesh-eZ10/Ansible.git'
-        ANSIBLE_DIR = "/var/lib/jenkins/workspace/${params.Pipeline_name}/ansible/"
+        TERRAFORM_DIR = "/var/lib/jenkins/workspace/${params.Pipeline_name}/terraform/s3/"
     }
   parameters {
         string(name: "Pipeline_name", defaultValue: "", description: "enter pipeline name")
-        choice(name: 'Ansible_Action', choices: ['install.yml', 'reboot.yml','patching.yml', 'uninstall.yml'], description: 'Select Terraform actions')
+        string(name: "bucketname", defaultValue: "", description: "enter bucket name")
     }
   stages {
     stage('Checkout SCM') {
@@ -15,17 +15,24 @@ pipeline {
             checkout([$class: 'GitSCM', branches: [[name: '*/master']], userRemoteConfigs: [[url: env.GIT_REPO_URL]]])
          }
         }
-        stage('Modify pem file permission') {
+        stage('updating parameter') {
         steps {
-             dir("${env.ANSIBLE_DIR}"){
-          sh "sudo chmod 400 devops.pem" //update your pem file name
+             dir("${env.TERRAFORM_DIR}"){
+          sh "sudo  sed -i -e 's/bucketname/${params.bucketname}/g' main.tf" //update your pem file name
              }
          }
         }
-        stage('Execute the pipeline') {
+        stage('Execute terraform init') {
             steps {
-                dir("${env.ANSIBLE_DIR}") {
-                    sh "ansible-playbook -i host ${params.Ansible_Action}"
+                dir("${env.TERRAFORM_DIR}") {
+                    sh "terraform init"
+                }
+            }
+        }
+        stage('Execute terraform apply') {
+            steps {
+                dir("${env.TERRAFORM_DIR}") {
+                    sh "terraform apply -auto-approve"
                 }
             }
         }
