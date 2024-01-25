@@ -6,7 +6,6 @@ pipeline {
     }
   parameters {
         string(name: "Pipeline_name", defaultValue: "", description: "enter pipeline name")
-        string(name: "bucketname", defaultValue: "", description: "enter bucket name")
         choice(name: 'Terraform_Action', choices: ['apply', 'destory'], description: 'Select Terraform actions')
         string(name: "terraform_path", defaultValue: "", description: "enter path")
     }
@@ -20,7 +19,7 @@ pipeline {
         stage('updating parameter') {
         steps {
              dir("${env.TERRAFORM_DIR}"){
-          sh "sudo  sed -i -e 's/bucketname/${params.bucketname}/g' main.tf" //update your pem file name
+          sh "sudo  sed -i -e 's/bucketname/${params.terraform_path}/g' main.tf" //update your pem file name
              }
          }
         }
