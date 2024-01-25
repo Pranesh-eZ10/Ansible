@@ -6,7 +6,7 @@ pipeline {
     }
   parameters {
         string(name: "Pipeline_name", defaultValue: "", description: "enter pipeline name")
-        choice(name: 'Terraform_Action', choices: ['apply', 'destory'], description: 'Select Terraform actions')
+        choice(name: 'Terraform_Action', choices: ['apply', 'destroy'], description: 'Select Terraform actions')
         string(name: "terraform_path", defaultValue: "", description: "enter path")
     }
   stages {
